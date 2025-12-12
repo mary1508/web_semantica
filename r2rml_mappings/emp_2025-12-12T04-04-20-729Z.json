@@ -1,0 +1,170 @@
+{
+  "name": "emp",
+  "created": "2025-12-12T04:04:20.729Z",
+  "mappingConfig": {
+    "triplesMaps": [
+      {
+        "id": "TriplesMap_doctor",
+        "logicalTable": {
+          "type": "table",
+          "tableName": "doctor"
+        },
+        "subjectMap": {
+          "template": "http://ejemplo.org/doctor/{doctor_no}",
+          "classes": [
+            "http://ejemplo.org/Doctor"
+          ]
+        },
+        "predicateObjectMaps": [
+          {
+            "predicate": "http://ejemplo.org/doctor#hospital_cod",
+            "objectMap": {
+              "column": "hospital_cod",
+              "datatype": "http://www.w3.org/2001/XMLSchema#integer"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/doctor#apellido",
+            "objectMap": {
+              "column": "apellido",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/doctor#especialidad",
+            "objectMap": {
+              "column": "especialidad",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          }
+        ]
+      },
+      {
+        "id": "TriplesMap_sala",
+        "logicalTable": {
+          "type": "table",
+          "tableName": "sala"
+        },
+        "subjectMap": {
+          "template": "http://ejemplo.org/sala/{sala_cod}",
+          "classes": [
+            "http://ejemplo.org/Sala"
+          ]
+        },
+        "predicateObjectMaps": [
+          {
+            "predicate": "http://ejemplo.org/sala#hospital_cod",
+            "objectMap": {
+              "column": "hospital_cod",
+              "datatype": "http://www.w3.org/2001/XMLSchema#integer"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/sala#nombre",
+            "objectMap": {
+              "column": "nombre",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/sala#num_cama",
+            "objectMap": {
+              "column": "num_cama",
+              "datatype": "http://www.w3.org/2001/XMLSchema#integer"
+            }
+          }
+        ]
+      },
+      {
+        "id": "TriplesMap_emp",
+        "logicalTable": {
+          "type": "table",
+          "tableName": "emp"
+        },
+        "subjectMap": {
+          "template": "http://ejemplo.org/emp/{emp_no}",
+          "classes": [
+            "http://ejemplo.org/Emp"
+          ]
+        },
+        "predicateObjectMaps": [
+          {
+            "predicate": "http://ejemplo.org/emp#apellido",
+            "objectMap": {
+              "column": "apellido",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#oficio",
+            "objectMap": {
+              "column": "oficio",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#dir",
+            "objectMap": {
+              "column": "dir",
+              "datatype": "http://www.w3.org/2001/XMLSchema#integer"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#fecha_alt",
+            "objectMap": {
+              "column": "fecha_alt",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#salario",
+            "objectMap": {
+              "column": "salario",
+              "datatype": "http://www.w3.org/2001/XMLSchema#decimal"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#comision",
+            "objectMap": {
+              "column": "comision",
+              "datatype": "http://www.w3.org/2001/XMLSchema#decimal"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#dept_no",
+            "objectMap": {
+              "column": "dept_no",
+              "datatype": "http://www.w3.org/2001/XMLSchema#integer"
+            }
+          }
+        ]
+      },
+      {
+        "id": "TriplesMap_1765511671578",
+        "logicalTable": {
+          "type": "table",
+          "tableName": "emp"
+        },
+        "subjectMap": {
+          "template": "http://ejemplo.org/emp/{emp_no}",
+          "classes": [
+            "http://ejemplo.org/emp"
+          ]
+        },
+        "predicateObjectMaps": [
+          {
+            "predicate": "http://ejemplo.org/apellido",
+            "objectMap": {
+              "parentTriplesMap": "",
+              "joinCondition": {
+                "child": "",
+                "parent": ""
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "r2rml": "@prefix rr: <http://www.w3.org/ns/r2rml#>.\n@prefix ex: <http://ejemplo.org/>.\n@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n\n"
+}

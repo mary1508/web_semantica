@@ -1,0 +1,45 @@
+{
+  "name": "prueba",
+  "created": "2025-12-12T03:40:19.582Z",
+  "mappingConfig": {
+    "triplesMaps": [
+      {
+        "id": "TriplesMap_doctor",
+        "logicalTable": {
+          "type": "table",
+          "tableName": "doctor"
+        },
+        "subjectMap": {
+          "template": "http://ejemplo.org/doctor/{doctor_no}",
+          "classes": [
+            "http://ejemplo.org/Doctor"
+          ]
+        },
+        "predicateObjectMaps": [
+          {
+            "predicate": "http://ejemplo.org/doctor#hospital_cod",
+            "objectMap": {
+              "column": "hospital_cod",
+              "datatype": "http://www.w3.org/2001/XMLSchema#integer"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/doctor#apellido",
+            "objectMap": {
+              "column": "apellido",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/doctor#especialidad",
+            "objectMap": {
+              "column": "especialidad",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "r2rml": "@prefix rr: <http://www.w3.org/ns/r2rml#>.\n@prefix ex: <http://ejemplo.org/>.\n@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n\n"
+}

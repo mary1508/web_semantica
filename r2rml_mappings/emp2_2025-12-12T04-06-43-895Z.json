@@ -1,0 +1,73 @@
+{
+  "name": "emp2",
+  "created": "2025-12-12T04:06:43.895Z",
+  "mappingConfig": {
+    "triplesMaps": [
+      {
+        "id": "TriplesMap_emp",
+        "logicalTable": {
+          "type": "table",
+          "tableName": "emp"
+        },
+        "subjectMap": {
+          "template": "http://ejemplo.org/emp/{emp_no}",
+          "classes": [
+            "http://ejemplo.org/Emp"
+          ]
+        },
+        "predicateObjectMaps": [
+          {
+            "predicate": "http://ejemplo.org/emp#apellido",
+            "objectMap": {
+              "column": "apellido",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#oficio",
+            "objectMap": {
+              "column": "oficio",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#dir",
+            "objectMap": {
+              "column": "dir",
+              "datatype": "http://www.w3.org/2001/XMLSchema#integer"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#fecha_alt",
+            "objectMap": {
+              "column": "fecha_alt",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#salario",
+            "objectMap": {
+              "column": "salario",
+              "datatype": "http://www.w3.org/2001/XMLSchema#decimal"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#comision",
+            "objectMap": {
+              "column": "comision",
+              "datatype": "http://www.w3.org/2001/XMLSchema#decimal"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#dept_no",
+            "objectMap": {
+              "column": "dept_no",
+              "datatype": "http://www.w3.org/2001/XMLSchema#integer"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "r2rml": null
+}

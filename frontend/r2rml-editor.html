@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor R2RML - DB2LinkedData</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/r2rml-editor.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎨 Editor Visual R2RML</h1>
+            <p>Crea y personaliza reglas de mapeo R2RML de forma interactiva</p>
+        </header>
+
+        <div class="editor-layout">
+            <!-- Panel izquierdo: Lista de TriplesMaps -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>TriplesMaps</h2>
+                    <button class="btn btn-primary btn-sm" onclick="addTriplesMap()">
+                        ➕ Nuevo
+                    </button>
+                </div>
+                
+                <div class="triplesMaps-list" id="triplesMapsList">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+
+                <div class="sidebar-actions">
+                    <button class="btn btn-secondary btn-block" onclick="loadTemplate()">
+                        📋 Cargar Plantilla
+                    </button>
+                    <button class="btn btn-secondary btn-block" onclick="loadSavedMapping()">
+                        📂 Cargar Guardado
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Panel central: Editor del TriplesMap seleccionado -->
+            <main class="editor-main">
+                <div id="editorPlaceholder" class="editor-placeholder">
+                    <div class="placeholder-content">
+                        <h2>👈 Selecciona o crea un TriplesMap</h2>
+                        <p>Usa el panel izquierdo para comenzar a crear tu mapeo R2RML</p>
+                    </div>
+                </div>
+
+                <div id="triplesMapEditor" class="triplesMap-editor" style="display: none;">
+                    <!-- Header del editor -->
+                    <div class="editor-header">
+                        <input type="text" id="tmId" class="tm-id-input" placeholder="ID del TriplesMap">
+                        <div class="editor-header-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="duplicateTriplesMap()">
+                                📋 Duplicar
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteTriplesMap()">
+                                🗑️ Eliminar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Logical Table -->
+                    <div class="editor-section">
+                        <h3>1️⃣ Logical Table</h3>
+                        <div class="form-group">
+                            <label>Tipo:</label>
+                            <select id="logicalTableType" class="form-control" onchange="toggleLogicalTableInputs()">
+                                <option value="table">Nombre de Tabla</option>
+                                <option value="query">SQL Query</option>
+                            </select>
+                        </div>
+
+                        <div id="tableNameGroup" class="form-group">
+                            <label>Nombre de la Tabla:</label>
+                            <input type="text" id="tableName" class="form-control" placeholder="employees">
+                        </div>
+
+                        <div id="sqlQueryGroup" class="form-group" style="display: none;">
+                            <label>SQL Query:</label>
+                            <textarea id="sqlQuery" class="form-control" rows="4" 
+                                      placeholder="SELECT * FROM employees WHERE active = true"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Subject Map -->
+                    <div class="editor-section">
+                        <h3>2️⃣ Subject Map</h3>
+                        
+                        <div class="form-group">
+                            <label>Tipo:</label>
+                            <select id="subjectType" class="form-control" onchange="toggleSubjectInputs()">
+                                <option value="template">Template (recomendado)</option>
+                                <option value="column">Column</option>
+                            </select>
+                        </div>
+
+                        <div id="subjectTemplateGroup" class="form-group">
+                            <label>Template URI:</label>
+                            <input type="text" id="subjectTemplate" class="form-control" 
+                                   placeholder="http://ejemplo.org/employee/{id}">
+                            <small>Usa {nombre_columna} para referencias dinámicas</small>
+                        </div>
+
+                        <div id="subjectColumnGroup" class="form-group" style="display: none;">
+                            <label>Columna:</label>
+                            <input type="text" id="subjectColumn" class="form-control" placeholder="id">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Clases RDF (una por línea):</label>
+                            <textarea id="subjectClasses" class="form-control" rows="3" 
+                                      placeholder="http://ejemplo.org/Employee&#10;http://xmlns.com/foaf/0.1/Person"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Predicate-Object Maps -->
+                    <div class="editor-section">
+                        <h3>3️⃣ Predicate-Object Maps</h3>
+                        <button class="btn btn-primary btn-sm" onclick="addPredicateObjectMap()">
+                            ➕ Agregar Propiedad
+                        </button>
+                        
+                        <div id="predicateObjectMapsList" class="pom-list">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="editor-actions">
+                        <button class="btn btn-success" onclick="saveTriplesMap()">
+                            💾 Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Panel derecho: Vista previa y acciones -->
+            <aside class="preview-panel">
+                <div class="preview-header">
+                    <h3>Vista Previa R2RML</h3>
+                </div>
+
+                <div class="preview-tabs">
+                    <button class="preview-tab active" onclick="showPreviewTab('visual')">
+                        Visual
+                    </button>
+                    <button class="preview-tab" onclick="showPreviewTab('code')">
+                        Código
+                    </button>
+                </div>
+
+                <div id="previewVisual" class="preview-content active">
+                    <div id="visualPreview" class="visual-preview">
+                        <p class="text-muted">La vista previa aparecerá aquí...</p>
+                    </div>
+                </div>
+
+                <div id="previewCode" class="preview-content" style="display: none;">
+                    <pre id="codePreview" class="code-preview">Genera el R2RML para ver el código...</pre>
+                </div>
+
+                <div class="preview-actions">
+                    <button class="btn btn-primary btn-block" onclick="generateR2RML()">
+                        🔄 Generar R2RML
+                    </button>
+                    <button class="btn btn-secondary btn-block" onclick="validateMapping()">
+                        ✅ Validar
+                    </button>
+                    <button class="btn btn-success btn-block" onclick="saveMapping()">
+                        💾 Guardar Configuración
+                    </button>
+                    <button class="btn btn-secondary btn-block" onclick="downloadR2RML()">
+                        📥 Descargar .ttl
+                    </button>
+                </div>
+
+                <div id="validationResult" class="validation-result" style="display: none;"></div>
+            </aside>
+        </div>
+    </div>
+
+    <script src="js/r2rml-editor.js"></script>
+</body>
+</html>

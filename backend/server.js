@@ -18,11 +18,13 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 const dbRoutes = require('./routes/dbRoutes');
 const mappingRoutes = require('./routes/mappingRoutes');
 const rdfRoutes = require('./routes/rdfRoutes');
+const r2rmlRoutes = require('./routes/r2rmlRoutes');
 
 // Usar rutas
 app.use('/api/db', dbRoutes);
 app.use('/api/mapping', mappingRoutes);
 app.use('/api/rdf', rdfRoutes);
+app.use('/api/r2rml', r2rmlRoutes);
 
 // Ruta de prueba
 app.get('/api/health', (req, res) => {
@@ -51,6 +53,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
   console.log(`📊 API disponible en http://localhost:${PORT}/api/health`);
+  console.log(`🎨 Editor R2RML en http://localhost:${PORT}/r2rml-editor.html`);
 });
 
 module.exports = app;
