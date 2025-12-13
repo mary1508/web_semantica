@@ -1,0 +1,73 @@
+{
+  "name": "emp",
+  "created": "2025-12-13T05:05:33.057Z",
+  "mappingConfig": {
+    "triplesMaps": [
+      {
+        "id": "TriplesMap_emp",
+        "logicalTable": {
+          "type": "table",
+          "tableName": "emp"
+        },
+        "subjectMap": {
+          "template": "http://ejemplo.org/emp/{emp_no}",
+          "classes": [
+            "http://ejemplo.org/Emp"
+          ]
+        },
+        "predicateObjectMaps": [
+          {
+            "predicate": "http://ejemplo.org/emp#apellido",
+            "objectMap": {
+              "column": "apellido",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#oficio",
+            "objectMap": {
+              "column": "oficio",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#dir",
+            "objectMap": {
+              "column": "dir",
+              "datatype": "http://www.w3.org/2001/XMLSchema#integer"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#fecha_alt",
+            "objectMap": {
+              "column": "fecha_alt",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#salario",
+            "objectMap": {
+              "column": "salario",
+              "datatype": "http://www.w3.org/2001/XMLSchema#decimal"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#comision",
+            "objectMap": {
+              "column": "comision",
+              "datatype": "http://www.w3.org/2001/XMLSchema#decimal"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/emp#dept_no",
+            "objectMap": {
+              "column": "dept_no",
+              "datatype": "http://www.w3.org/2001/XMLSchema#integer"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "r2rml": "@prefix rr: <http://www.w3.org/ns/r2rml#>.\n@prefix ex: <http://ejemplo.org/>.\n@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n\n<http://ejemplo.org/mapping/TriplesMap_emp> a rr:TriplesMap;\n    rr:logicalTable <http://ejemplo.org/mapping/TriplesMap_emp_LogicalTable>.\n<http://ejemplo.org/mapping/TriplesMap_emp_LogicalTable> rr:tableName \"emp\".\n<http://ejemplo.org/mapping/TriplesMap_emp> rr:subjectMap <http://ejemplo.org/mapping/TriplesMap_emp_SubjectMap>.\n<http://ejemplo.org/mapping/TriplesMap_emp_SubjectMap> rr:template \"http://ejemplo.org/emp/{emp_no}\";\n    rr:class ex:Emp.\n<http://ejemplo.org/mapping/TriplesMap_emp> rr:predicateObjectMap <http://ejemplo.org/mapping/TriplesMap_emp_POM_0>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_0> rr:predicateMap <http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_0>.\n<http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_0> rr:constant <http://ejemplo.org/emp#apellido>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_0> rr:objectMap <http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_0>.\n<http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_0> rr:column \"apellido\";\n    rr:datatype xsd:string.\n<http://ejemplo.org/mapping/TriplesMap_emp> rr:predicateObjectMap <http://ejemplo.org/mapping/TriplesMap_emp_POM_1>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_1> rr:predicateMap <http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_1>.\n<http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_1> rr:constant <http://ejemplo.org/emp#oficio>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_1> rr:objectMap <http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_1>.\n<http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_1> rr:column \"oficio\";\n    rr:datatype xsd:string.\n<http://ejemplo.org/mapping/TriplesMap_emp> rr:predicateObjectMap <http://ejemplo.org/mapping/TriplesMap_emp_POM_2>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_2> rr:predicateMap <http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_2>.\n<http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_2> rr:constant <http://ejemplo.org/emp#dir>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_2> rr:objectMap <http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_2>.\n<http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_2> rr:column \"dir\";\n    rr:datatype xsd:integer.\n<http://ejemplo.org/mapping/TriplesMap_emp> rr:predicateObjectMap <http://ejemplo.org/mapping/TriplesMap_emp_POM_3>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_3> rr:predicateMap <http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_3>.\n<http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_3> rr:constant <http://ejemplo.org/emp#fecha_alt>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_3> rr:objectMap <http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_3>.\n<http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_3> rr:column \"fecha_alt\";\n    rr:datatype xsd:string.\n<http://ejemplo.org/mapping/TriplesMap_emp> rr:predicateObjectMap <http://ejemplo.org/mapping/TriplesMap_emp_POM_4>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_4> rr:predicateMap <http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_4>.\n<http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_4> rr:constant <http://ejemplo.org/emp#salario>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_4> rr:objectMap <http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_4>.\n<http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_4> rr:column \"salario\";\n    rr:datatype xsd:decimal.\n<http://ejemplo.org/mapping/TriplesMap_emp> rr:predicateObjectMap <http://ejemplo.org/mapping/TriplesMap_emp_POM_5>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_5> rr:predicateMap <http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_5>.\n<http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_5> rr:constant <http://ejemplo.org/emp#comision>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_5> rr:objectMap <http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_5>.\n<http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_5> rr:column \"comision\";\n    rr:datatype xsd:decimal.\n<http://ejemplo.org/mapping/TriplesMap_emp> rr:predicateObjectMap <http://ejemplo.org/mapping/TriplesMap_emp_POM_6>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_6> rr:predicateMap <http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_6>.\n<http://ejemplo.org/mapping/TriplesMap_emp_PredicateMap_6> rr:constant <http://ejemplo.org/emp#dept_no>.\n<http://ejemplo.org/mapping/TriplesMap_emp_POM_6> rr:objectMap <http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_6>.\n<http://ejemplo.org/mapping/TriplesMap_emp_ObjectMap_6> rr:column \"dept_no\";\n    rr:datatype xsd:integer.\n"
+}

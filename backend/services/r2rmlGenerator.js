@@ -1,213 +1,137 @@
-const { Writer, DataFactory } = require('n3');
-const { namedNode, literal } = DataFactory;
-
 /**
- * Generador de reglas R2RML personalizadas
+ * Generador de reglas R2RML personalizadas con formato compacto
  */
 class R2RMLGenerator {
   constructor(baseNamespace = 'http://ejemplo.org/') {
     this.baseNamespace = baseNamespace;
     this.mappingNamespace = `${baseNamespace}mapping/`;
-    this.writer = new Writer({
-      prefixes: {
-        rr: 'http://www.w3.org/ns/r2rml#',
-        ex: baseNamespace,
-        rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-        rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
-        xsd: 'http://www.w3.org/2001/XMLSchema#'
-      }
-    });
   }
 
   /**
    * Generar documento R2RML completo desde configuración
    */
   async generateR2RML(mappingConfig) {
-    const quads = [];
-
+    let turtle = this.generatePrefixes();
+    
     for (const triplesMap of mappingConfig.triplesMaps) {
-      quads.push(...this.generateTriplesMap(triplesMap));
+      turtle += '\n' + this.generateTriplesMapTurtle(triplesMap);
     }
-
-    return new Promise((resolve, reject) => {
-      this.writer.addQuads(quads);
-      this.writer.end((error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      });
-    });
+    
+    return turtle;
   }
 
   /**
-   * Generar un TriplesMap completo
+   * Generar prefijos
    */
-  generateTriplesMap(config) {
-    const quads = [];
-    const tmURI = namedNode(`${this.mappingNamespace}${config.id}`);
+  generatePrefixes() {
+    return `@prefix : <${this.mappingNamespace}>.
+@prefix rr: <http://www.w3.org/ns/r2rml#>.
+@prefix ex: <${this.baseNamespace}>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
 
-    // TriplesMap declaration
-    quads.push({
-      subject: tmURI,
-      predicate: namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-      object: namedNode('http://www.w3.org/ns/r2rml#TriplesMap')
-    });
+`;
+  }
 
+  /**
+   * Generar un TriplesMap completo en formato Turtle compacto
+   */
+  generateTriplesMapTurtle(config) {
+    const tmId = `:${config.id}`;
+    let turtle = `${tmId} a rr:TriplesMap;\n`;
+    
     // Logical Table
-    const logicalTableNode = namedNode(`${this.mappingNamespace}${config.id}_LogicalTable`);
-    quads.push({
-      subject: tmURI,
-      predicate: namedNode('http://www.w3.org/ns/r2rml#logicalTable'),
-      object: logicalTableNode
-    });
-
+    turtle += `    rr:logicalTable [\n`;
     if (config.logicalTable.type === 'table') {
-      quads.push({
-        subject: logicalTableNode,
-        predicate: namedNode('http://www.w3.org/ns/r2rml#tableName'),
-        object: literal(config.logicalTable.tableName)
-      });
+      turtle += `        rr:tableName "${this.escapeLiteral(config.logicalTable.tableName)}"\n`;
     } else if (config.logicalTable.type === 'query') {
-      quads.push({
-        subject: logicalTableNode,
-        predicate: namedNode('http://www.w3.org/ns/r2rml#sqlQuery'),
-        object: literal(config.logicalTable.sqlQuery)
-      });
+      turtle += `        rr:sqlQuery """${this.escapeLiteral(config.logicalTable.sqlQuery)}"""\n`;
     }
-
+    turtle += `    ];\n`;
+    
     // Subject Map
-    const subjectMapNode = namedNode(`${this.mappingNamespace}${config.id}_SubjectMap`);
-    quads.push({
-      subject: tmURI,
-      predicate: namedNode('http://www.w3.org/ns/r2rml#subjectMap'),
-      object: subjectMapNode
-    });
-
-    // Subject template o column
+    turtle += `    rr:subjectMap [\n`;
     if (config.subjectMap.template) {
-      quads.push({
-        subject: subjectMapNode,
-        predicate: namedNode('http://www.w3.org/ns/r2rml#template'),
-        object: literal(config.subjectMap.template)
-      });
+      turtle += `        rr:template "${this.escapeLiteral(config.subjectMap.template)}"`;
     } else if (config.subjectMap.column) {
-      quads.push({
-        subject: subjectMapNode,
-        predicate: namedNode('http://www.w3.org/ns/r2rml#column'),
-        object: literal(config.subjectMap.column)
-      });
+      turtle += `        rr:column "${this.escapeLiteral(config.subjectMap.column)}"`;
     }
-
-    // Subject classes
+    
+    // Classes
     if (config.subjectMap.classes && config.subjectMap.classes.length > 0) {
       config.subjectMap.classes.forEach(cls => {
-        quads.push({
-          subject: subjectMapNode,
-          predicate: namedNode('http://www.w3.org/ns/r2rml#class'),
-          object: namedNode(cls)
-        });
+        turtle += `;\n        rr:class ${this.formatURI(cls)}`;
       });
     }
-
+    turtle += `\n    ]`;
+    
     // Predicate-Object Maps
-    config.predicateObjectMaps.forEach((pom, index) => {
-      const pomNode = namedNode(`${this.mappingNamespace}${config.id}_POM_${index}`);
-      
-      quads.push({
-        subject: tmURI,
-        predicate: namedNode('http://www.w3.org/ns/r2rml#predicateObjectMap'),
-        object: pomNode
-      });
-
-      // Predicate Map
-      const predicateMapNode = namedNode(`${this.mappingNamespace}${config.id}_PredicateMap_${index}`);
-      quads.push({
-        subject: pomNode,
-        predicate: namedNode('http://www.w3.org/ns/r2rml#predicateMap'),
-        object: predicateMapNode
-      });
-
-      quads.push({
-        subject: predicateMapNode,
-        predicate: namedNode('http://www.w3.org/ns/r2rml#constant'),
-        object: namedNode(pom.predicate)
-      });
-
-      // Object Map
-      const objectMapNode = namedNode(`${this.mappingNamespace}${config.id}_ObjectMap_${index}`);
-      quads.push({
-        subject: pomNode,
-        predicate: namedNode('http://www.w3.org/ns/r2rml#objectMap'),
-        object: objectMapNode
-      });
-
-      if (pom.objectMap.column) {
-        quads.push({
-          subject: objectMapNode,
-          predicate: namedNode('http://www.w3.org/ns/r2rml#column'),
-          object: literal(pom.objectMap.column)
-        });
-
-        // Datatype
-        if (pom.objectMap.datatype) {
-          quads.push({
-            subject: objectMapNode,
-            predicate: namedNode('http://www.w3.org/ns/r2rml#datatype'),
-            object: namedNode(pom.objectMap.datatype)
-          });
+    if (config.predicateObjectMaps && config.predicateObjectMaps.length > 0) {
+      config.predicateObjectMaps.forEach((pom, index) => {
+        turtle += `;\n    rr:predicateObjectMap [\n`;
+        turtle += `        rr:predicate ${this.formatURI(pom.predicate)};\n`;
+        turtle += `        rr:objectMap [\n`;
+        
+        if (pom.objectMap.column) {
+          turtle += `            rr:column "${this.escapeLiteral(pom.objectMap.column)}"`;
+          
+          if (pom.objectMap.datatype) {
+            turtle += `;\n            rr:datatype ${this.formatURI(pom.objectMap.datatype)}`;
+          }
+          
+          if (pom.objectMap.language) {
+            turtle += `;\n            rr:language "${this.escapeLiteral(pom.objectMap.language)}"`;
+          }
+        } else if (pom.objectMap.template) {
+          turtle += `            rr:template "${this.escapeLiteral(pom.objectMap.template)}"`;
+        } else if (pom.objectMap.constant) {
+          turtle += `            rr:constant "${this.escapeLiteral(pom.objectMap.constant)}"`;
+        } else if (pom.objectMap.parentTriplesMap) {
+          turtle += `            rr:parentTriplesMap :${pom.objectMap.parentTriplesMap}`;
+          
+          if (pom.objectMap.joinCondition) {
+            turtle += `;\n            rr:joinCondition [\n`;
+            turtle += `                rr:child "${this.escapeLiteral(pom.objectMap.joinCondition.child)}";\n`;
+            turtle += `                rr:parent "${this.escapeLiteral(pom.objectMap.joinCondition.parent)}"\n`;
+            turtle += `            ]`;
+          }
         }
+        
+        turtle += `\n        ]\n`;
+        turtle += `    ]`;
+      });
+    }
+    
+    turtle += `.\n`;
+    return turtle;
+  }
 
-        // Language
-        if (pom.objectMap.language) {
-          quads.push({
-            subject: objectMapNode,
-            predicate: namedNode('http://www.w3.org/ns/r2rml#language'),
-            object: literal(pom.objectMap.language)
-          });
-        }
-      } else if (pom.objectMap.template) {
-        quads.push({
-          subject: objectMapNode,
-          predicate: namedNode('http://www.w3.org/ns/r2rml#template'),
-          object: literal(pom.objectMap.template)
-        });
-      } else if (pom.objectMap.constant) {
-        quads.push({
-          subject: objectMapNode,
-          predicate: namedNode('http://www.w3.org/ns/r2rml#constant'),
-          object: literal(pom.objectMap.constant)
-        });
-      } else if (pom.objectMap.parentTriplesMap) {
-        // Reference Object Map (para relaciones)
-        quads.push({
-          subject: objectMapNode,
-          predicate: namedNode('http://www.w3.org/ns/r2rml#parentTriplesMap'),
-          object: namedNode(`${this.mappingNamespace}${pom.objectMap.parentTriplesMap}`)
-        });
+  /**
+   * Formatear URI (usar prefijo si aplica)
+   */
+  formatURI(uri) {
+    if (uri.startsWith(this.baseNamespace)) {
+      const localPart = uri.substring(this.baseNamespace.length);
+      return `ex:${localPart}`;
+    } else if (uri.startsWith('http://www.w3.org/2001/XMLSchema#')) {
+      const localPart = uri.substring('http://www.w3.org/2001/XMLSchema#'.length);
+      return `xsd:${localPart}`;
+    } else if (uri.startsWith(this.mappingNamespace)) {
+      const localPart = uri.substring(this.mappingNamespace.length);
+      return `:${localPart}`;
+    }
+    return `<${uri}>`;
+  }
 
-        if (pom.objectMap.joinCondition) {
-          const joinNode = namedNode(`${this.mappingNamespace}${config.id}_Join_${index}`);
-          quads.push({
-            subject: objectMapNode,
-            predicate: namedNode('http://www.w3.org/ns/r2rml#joinCondition'),
-            object: joinNode
-          });
-
-          quads.push({
-            subject: joinNode,
-            predicate: namedNode('http://www.w3.org/ns/r2rml#child'),
-            object: literal(pom.objectMap.joinCondition.child)
-          });
-
-          quads.push({
-            subject: joinNode,
-            predicate: namedNode('http://www.w3.org/ns/r2rml#parent'),
-            object: literal(pom.objectMap.joinCondition.parent)
-          });
-        }
-      }
-    });
-
-    return quads;
+  /**
+   * Escapar caracteres especiales en literales
+   */
+  escapeLiteral(str) {
+    return str
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/\t/g, '\\t');
   }
 
   /**
@@ -280,7 +204,7 @@ class R2RMLGenerator {
       predicateObjectMaps: columns
         .filter(col => col.column_name !== primaryKey)
         .map(col => ({
-          predicate: `${this.baseNamespace}${tableName}#${col.column_name}`,
+          predicate: `${this.baseNamespace}${col.column_name}`,
           objectMap: {
             column: col.column_name,
             datatype: this.sqlToXSDType(col.data_type)

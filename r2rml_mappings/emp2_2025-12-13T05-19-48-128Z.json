@@ -1,0 +1,73 @@
+{
+  "name": "emp2",
+  "created": "2025-12-13T05:19:48.128Z",
+  "mappingConfig": {
+    "triplesMaps": [
+      {
+        "id": "TriplesMap_emp",
+        "logicalTable": {
+          "type": "table",
+          "tableName": "emp"
+        },
+        "subjectMap": {
+          "template": "http://ejemplo.org/emp/{emp_no}",
+          "classes": [
+            "http://ejemplo.org/Emp"
+          ]
+        },
+        "predicateObjectMaps": [
+          {
+            "predicate": "http://ejemplo.org/apellido",
+            "objectMap": {
+              "column": "apellido",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/oficio",
+            "objectMap": {
+              "column": "oficio",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/dir",
+            "objectMap": {
+              "column": "dir",
+              "datatype": "http://www.w3.org/2001/XMLSchema#integer"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/fecha_alt",
+            "objectMap": {
+              "column": "fecha_alt",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/salario",
+            "objectMap": {
+              "column": "salario",
+              "datatype": "http://www.w3.org/2001/XMLSchema#decimal"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/comision",
+            "objectMap": {
+              "column": "comision",
+              "datatype": "http://www.w3.org/2001/XMLSchema#decimal"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/dept_no",
+            "objectMap": {
+              "column": "dept_no",
+              "datatype": "http://www.w3.org/2001/XMLSchema#integer"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "r2rml": "@prefix : <http://ejemplo.org/mapping/>.\n@prefix rr: <http://www.w3.org/ns/r2rml#>.\n@prefix ex: <http://ejemplo.org/>.\n@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n\n:TriplesMap_emp a rr:TriplesMap;\n    rr:logicalTable _:n3-0.\n_:n3-0 rr:tableName \"emp\".\n:TriplesMap_emp rr:subjectMap _:n3-1.\n_:n3-1 rr:template \"http://ejemplo.org/emp/{emp_no}\";\n    rr:class ex:Emp.\n:TriplesMap_emp rr:predicateObjectMap _:n3-2.\n_:n3-2 rr:predicateMap _:n3-3.\n_:n3-3 rr:constant ex:apellido.\n_:n3-2 rr:objectMap _:n3-4.\n_:n3-4 rr:column \"apellido\";\n    rr:datatype xsd:string.\n:TriplesMap_emp rr:predicateObjectMap _:n3-5.\n_:n3-5 rr:predicateMap _:n3-6.\n_:n3-6 rr:constant ex:oficio.\n_:n3-5 rr:objectMap _:n3-7.\n_:n3-7 rr:column \"oficio\";\n    rr:datatype xsd:string.\n:TriplesMap_emp rr:predicateObjectMap _:n3-8.\n_:n3-8 rr:predicateMap _:n3-9.\n_:n3-9 rr:constant ex:dir.\n_:n3-8 rr:objectMap _:n3-10.\n_:n3-10 rr:column \"dir\";\n    rr:datatype xsd:integer.\n:TriplesMap_emp rr:predicateObjectMap _:n3-11.\n_:n3-11 rr:predicateMap _:n3-12.\n_:n3-12 rr:constant ex:fecha_alt.\n_:n3-11 rr:objectMap _:n3-13.\n_:n3-13 rr:column \"fecha_alt\";\n    rr:datatype xsd:string.\n:TriplesMap_emp rr:predicateObjectMap _:n3-14.\n_:n3-14 rr:predicateMap _:n3-15.\n_:n3-15 rr:constant ex:salario.\n_:n3-14 rr:objectMap _:n3-16.\n_:n3-16 rr:column \"salario\";\n    rr:datatype xsd:decimal.\n:TriplesMap_emp rr:predicateObjectMap _:n3-17.\n_:n3-17 rr:predicateMap _:n3-18.\n_:n3-18 rr:constant ex:comision.\n_:n3-17 rr:objectMap _:n3-19.\n_:n3-19 rr:column \"comision\";\n    rr:datatype xsd:decimal.\n:TriplesMap_emp rr:predicateObjectMap _:n3-20.\n_:n3-20 rr:predicateMap _:n3-21.\n_:n3-21 rr:constant ex:dept_no.\n_:n3-20 rr:objectMap _:n3-22.\n_:n3-22 rr:column \"dept_no\";\n    rr:datatype xsd:integer.\n"
+}
