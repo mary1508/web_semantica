@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exportar Esquemas R2RML - DB2LinkedData</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .export-formats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .format-card {
+            background: #f8f9fa;
+            border: 3px solid #dee2e6;
+            border-radius: 10px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .format-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .format-card.selected {
+            border-color: #3498db;
+            background: #e8f4f8;
+        }
+        
+        .format-icon {
+            width: 60px;
+            height: 60px;
+            background: #3498db;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+        
+        .format-card.selected .format-icon {
+            background: #27ae60;
+        }
+        
+        .check-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #27ae60;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .options-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .preview-box {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 25px;
+            border-radius: 10px;
+            font-family: monospace;
+            margin: 25px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1> Exportar Esquemas R2RML</h1>
+            <p>Descarga tus mapeos en formatos estándar</p>
+        </header>
+
+        <div class="card" style="padding: 40px;">
+            <h2>Selecciona Formatos de Exportación</h2>
+            
+            <div class="export-formats">
+                <div class="format-card selected" data-format="turtle">
+                    <span class="check-badge">✓</span>
+                    <div class="format-icon">📄</div>
+                    <h3>Turtle (.ttl)</h3>
+                    <p>Formato legible y compacto (Recomendado)</p>
+                </div>
+                
+                <div class="format-card" data-format="rdfxml">
+                    <div class="format-icon">📋</div>
+                    <h3>RDF/XML (.rdf)</h3>
+                    <p>Formato XML estándar W3C</p>
+                </div>
+                
+                <div class="format-card" data-format="ntriples">
+                    <div class="format-icon">📝</div>
+                    <h3>N-Triples (.nt)</h3>
+                    <p>Formato simple línea por línea</p>
+                </div>
+                
+                <div class="format-card" data-format="json">
+                    <div class="format-icon">🔧</div>
+                    <h3>JSON (.json)</h3>
+                    <p>Configuración en formato JSON</p>
+                </div>
+            </div>
+
+            <div class="options-box">
+                <h3>Opciones Adicionales</h3>
+                
+                <label class="option-item">
+                    <input type="checkbox" id="includeMetadata" checked>
+                    <div>
+                        <strong>Incluir Metadatos</strong>
+                        <p style="margin: 0; color: #7f8c8d; font-size: 0.9em;">
+                            Fecha de creación, autor, versión
+                        </p>
+                    </div>
+                </label>
+                
+                <label class="option-item">
+                    <input type="checkbox" id="includeStatistics" checked>
+                    <div>
+                        <strong>Incluir Estadísticas</strong>
+                        <p style="margin: 0; color: #7f8c8d; font-size: 0.9em;">
+                            Conteo de TriplesMaps, propiedades, etc.
+                        </p>
+                    </div>
+                </label>
+                
+                <label class="option-item">
+                    <input type="checkbox" id="includeReadme" checked>
+                    <div>
+                        <strong>Generar README.md</strong>
+                        <p style="margin: 0; color: #7f8c8d; font-size: 0.9em;">
+                            Documentación del mapeo
+                        </p>
+                    </div>
+                </label>
+            </div>
+
+            <div class="preview-box">
+                <h3 style="margin-bottom: 15px;"> Vista Previa del Paquete</h3>
+                <div id="packagePreview">
+                    mapping_export_2025_12_14/<br>
+                    ├── mapping.ttl<br>
+                    ├── metadata.json<br>
+                    ├── statistics.json<br>
+                    └── README.md
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-success" onclick="exportSchemas()" style="font-size: 1.2em; padding: 15px 40px;">
+                     Exportar Esquemas
+                </button>
+                
+                <button class="btn btn-secondary" onclick="copyToClipboard()" style="margin-left: 10px;">
+                     Copiar R2RML
+                </button>
+            </div>
+
+            <div id="exportStatus" class="status-box" style="display: none; margin-top: 25px;"></div>
+        </div>
+    </div>
+
+    <script src="js/export.js"></script>
+</body>
+</html>

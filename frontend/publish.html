@@ -214,7 +214,7 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1>📤 Publicar en SPARQL Endpoint</h1>
+            <h1> Publicar en SPARQL Endpoint</h1>
             <p>Publica tus datos enlazados en Apache Jena Fuseki</p>
         </header>
 
@@ -288,7 +288,7 @@
                 </div>
 
                 <button class="btn btn-success" onclick="publishRDF()" style="width: 100%; padding: 15px; font-size: 1.1em;">
-                    📤 Publicar Datos RDF
+                     Publicar Datos RDF
                 </button>
             </div>
 
@@ -303,7 +303,7 @@
             <!-- Resultado de publicación -->
             <div id="resultSection" style="display: none;">
                 <div class="result-card">
-                    <h3>✅ Publicación Exitosa</h3>
+                    <h3> Publicación Exitosa</h3>
                     
                     <div class="result-item">
                         <span class="result-label">Triples publicados:</span>
@@ -321,14 +321,14 @@
                     </div>
                     
                     <button class="btn btn-secondary" onclick="loadStats()" style="margin-top: 15px; width: 100%;">
-                        📊 Ver Estadísticas del Dataset
+                         Ver Estadísticas del Dataset
                     </button>
                 </div>
             </div>
 
             <!-- Estadísticas -->
             <div id="statsSection" class="card" style="display: none;">
-                <h2>📊 Estadísticas del Dataset</h2>
+                <h2> Estadísticas del Dataset</h2>
                 <div id="statsGrid" class="stats-grid">
                     <!-- Se llenará dinámicamente -->
                 </div>
@@ -551,22 +551,22 @@
             const grid = document.getElementById('statsGrid');
             grid.innerHTML = `
                 <div class="stat-box">
-                    <div style="font-size: 2em;">📦</div>
+                    <div style="font-size: 2em;"></div>
                     <div class="stat-value">${stats.totalTriples?.toLocaleString() || 0}</div>
                     <div class="stat-label">Total Triples</div>
                 </div>
                 <div class="stat-box">
-                    <div style="font-size: 2em;">🎯</div>
+                    <div style="font-size: 2em;"></div>
                     <div class="stat-value">${stats.totalSubjects?.toLocaleString() || 0}</div>
                     <div class="stat-label">Recursos</div>
                 </div>
                 <div class="stat-box">
-                    <div style="font-size: 2em;">🔗</div>
+                    <div style="font-size: 2em;"></div>
                     <div class="stat-value">${stats.totalPredicates?.toLocaleString() || 0}</div>
                     <div class="stat-label">Propiedades Únicas</div>
                 </div>
                 <div class="stat-box">
-                    <div style="font-size: 2em;">📊</div>
+                    <div style="font-size: 2em;"></div>
                     <div class="stat-value">${stats.classes?.length || 0}</div>
                     <div class="stat-label">Clases</div>
                 </div>

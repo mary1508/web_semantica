@@ -10,7 +10,7 @@ const API_BASE = 'http://localhost:3000/api';
 
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎨 Editor R2RML cargado');
+    console.log(' Editor R2RML cargado');
     renderTriplesMapslist();
 });
 
@@ -189,7 +189,7 @@ function renderTriplesMapslist() {
              onclick="selectTriplesMap(${index})">
             <div class="tm-name">${tm.id || 'Sin nombre'}</div>
             <div class="tm-info">
-                📊 ${tm.predicateObjectMaps?.length || 0} propiedades
+                 ${tm.predicateObjectMaps?.length || 0} propiedades
             </div>
         </div>
     `).join('');
@@ -444,7 +444,7 @@ function updateVisualPreview() {
             <div class="preview-triplesmap-header">${tm.id || 'Sin ID'}</div>
             
             <div class="preview-section">
-                <div class="preview-section-title">📊 Logical Table</div>
+                <div class="preview-section-title"> Logical Table</div>
                 <div class="preview-item">
                     ${tm.logicalTable.type === 'table' ? 
                         `Tabla: <strong>${tm.logicalTable.tableName}</strong>` : 
@@ -453,7 +453,7 @@ function updateVisualPreview() {
             </div>
             
             <div class="preview-section">
-                <div class="preview-section-title">🎯 Subject</div>
+                <div class="preview-section-title"> Subject</div>
                 <div class="preview-item">
                     ${tm.subjectMap.template || tm.subjectMap.column || 'No definido'}
                 </div>
@@ -465,7 +465,7 @@ function updateVisualPreview() {
             </div>
             
             <div class="preview-section">
-                <div class="preview-section-title">🔗 Propiedades (${tm.predicateObjectMaps?.length || 0})</div>
+                <div class="preview-section-title"> Propiedades (${tm.predicateObjectMaps?.length || 0})</div>
                 ${(tm.predicateObjectMaps || []).map(pom => `
                     <div class="preview-item">
                         <span class="preview-predicate">${pom.predicate || '?'}</span>

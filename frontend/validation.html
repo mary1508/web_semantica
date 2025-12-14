@@ -142,13 +142,13 @@
                 
                 <div class="validation-actions">
                     <button class="btn btn-primary" onclick="validateCurrentRDF()">
-                        🔍 Validación Completa
+                         Validación Completa
                     </button>
                     <button class="btn btn-secondary" onclick="quickValidate()">
-                        ⚡ Validación Rápida
+                         Validación Rápida
                     </button>
                     <button class="btn btn-secondary" onclick="checkCompleteness()">
-                        📊 Verificar Completitud
+                         Verificar Completitud
                     </button>
                 </div>
                 
@@ -162,7 +162,7 @@
 
             <!-- Estado vacío inicial -->
             <div id="emptyState" class="empty-state">
-                <div class="empty-state-icon">🎯</div>
+                <div class="empty-state-icon"></div>
                 <h2>No hay validación aún</h2>
                 <p>Primero genera datos RDF (Direct Mapping o R2RML) y luego valídalos aquí</p>
             </div>
@@ -176,7 +176,7 @@
 
             <!-- Métricas -->
             <div id="metricsSection" class="validation-section" style="display: none;">
-                <h2>📊 Métricas de Calidad</h2>
+                <h2> Métricas de Calidad</h2>
                 <div class="metrics-grid" id="metricsGrid">
                     <!-- Se llenará dinámicamente -->
                 </div>
@@ -282,7 +282,7 @@
 
                 const result = await response.json();
                 displayValidationResults(result.validation);
-                showNotification('⚡ Validación rápida completada', 'success');
+                showNotification(' Validación rápida completada', 'success');
 
             } catch (error) {
                 alert(`❌ Error: ${error.message}`);
@@ -307,10 +307,10 @@
                 });
 
                 const result = await response.json();
-                alert(`📊 Completitud: ${result.completeness}\n\nRecursos esperados: ${result.metrics.expectedResources}\nRecursos encontrados: ${result.metrics.definedResources}`);
+                alert(` Completitud: ${result.completeness}\n\nRecursos esperados: ${result.metrics.expectedResources}\nRecursos encontrados: ${result.metrics.definedResources}`);
 
             } catch (error) {
-                alert(`❌ Error: ${error.message}`);
+                alert(` Error: ${error.message}`);
             } finally {
                 showLoading(false);
             }
@@ -355,12 +355,12 @@
             grid.innerHTML = '';
 
             const metricsList = [
-                { label: 'Total Triples', value: metrics.totalTriples, icon: '📦' },
-                { label: 'Recursos Únicos', value: metrics.uniqueSubjects, icon: '🎯' },
-                { label: 'Propiedades', value: metrics.uniquePredicates, icon: '🔗' },
-                { label: 'Densidad Info', value: metrics.informationDensity, icon: '📊' },
+                { label: 'Total Triples', value: metrics.totalTriples, icon: '' },
+                { label: 'Recursos Únicos', value: metrics.uniqueSubjects, icon: '' },
+                { label: 'Propiedades', value: metrics.uniquePredicates, icon: '' },
+                { label: 'Densidad Info', value: metrics.informationDensity, icon: '' },
                 { label: 'Completitud', value: metrics.completeness || 'N/A', icon: '✓' },
-                { label: 'Tiempo', value: metrics.validationTime, icon: '⏱️' }
+                { label: 'Tiempo', value: metrics.validationTime, icon: '' }
             ];
 
             metricsList.forEach(metric => {
