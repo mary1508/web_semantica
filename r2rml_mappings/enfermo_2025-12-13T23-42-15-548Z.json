@@ -1,0 +1,59 @@
+{
+  "name": "enfermo",
+  "created": "2025-12-13T23:42:15.548Z",
+  "mappingConfig": {
+    "triplesMaps": [
+      {
+        "id": "TriplesMap_enfermo",
+        "logicalTable": {
+          "type": "table",
+          "tableName": "enfermo"
+        },
+        "subjectMap": {
+          "template": "http://ejemplo.org/enfermo/{inscripcion}",
+          "classes": [
+            "http://ejemplo.org/Enfermo"
+          ]
+        },
+        "predicateObjectMaps": [
+          {
+            "predicate": "http://ejemplo.org/apellido",
+            "objectMap": {
+              "column": "apellido",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/direccion",
+            "objectMap": {
+              "column": "direccion",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/fecha_nac",
+            "objectMap": {
+              "column": "fecha_nac",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/s",
+            "objectMap": {
+              "column": "s",
+              "datatype": "http://www.w3.org/2001/XMLSchema#string"
+            }
+          },
+          {
+            "predicate": "http://ejemplo.org/nss",
+            "objectMap": {
+              "column": "nss",
+              "datatype": "http://www.w3.org/2001/XMLSchema#integer"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "r2rml": "@prefix : <http://ejemplo.org/mapping/>.\n@prefix rr: <http://www.w3.org/ns/r2rml#>.\n@prefix ex: <http://ejemplo.org/>.\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n\n\n:TriplesMap_enfermo a rr:TriplesMap;\n    rr:logicalTable [\n        rr:tableName \"enfermo\"\n    ];\n    rr:subjectMap [\n        rr:template \"http://ejemplo.org/enfermo/{inscripcion}\";\n        rr:class ex:Enfermo\n    ];\n    rr:predicateObjectMap [\n        rr:predicate ex:apellido;\n        rr:objectMap [\n            rr:column \"apellido\";\n            rr:datatype xsd:string\n        ]\n    ];\n    rr:predicateObjectMap [\n        rr:predicate ex:direccion;\n        rr:objectMap [\n            rr:column \"direccion\";\n            rr:datatype xsd:string\n        ]\n    ];\n    rr:predicateObjectMap [\n        rr:predicate ex:fecha_nac;\n        rr:objectMap [\n            rr:column \"fecha_nac\";\n            rr:datatype xsd:string\n        ]\n    ];\n    rr:predicateObjectMap [\n        rr:predicate ex:s;\n        rr:objectMap [\n            rr:column \"s\";\n            rr:datatype xsd:string\n        ]\n    ];\n    rr:predicateObjectMap [\n        rr:predicate ex:nss;\n        rr:objectMap [\n            rr:column \"nss\";\n            rr:datatype xsd:integer\n        ]\n    ].\n"
+}

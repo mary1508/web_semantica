@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validación de Calidad RDF - DB2LinkedData</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .validation-container {
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+        
+        .validation-section {
+            margin-bottom: 30px;
+        }
+        
+        .score-display {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .score-number {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .score-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .metric-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .results-section {
+            margin-top: 30px;
+        }
+        
+        .result-category {
+            margin-bottom: 25px;
+        }
+        
+        .result-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .result-item.passed {
+            background: #d5f4e6;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .result-item.warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .result-item.error {
+            background: #fadbd8;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .result-icon {
+            font-size: 1.3em;
+        }
+        
+        .result-message {
+            flex: 1;
+        }
+        
+        .result-code {
+            font-size: 0.85em;
+            opacity: 0.7;
+            font-family: monospace;
+        }
+        
+        .validation-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #95a5a6;
+        }
+        
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔍 Validación de Calidad RDF</h1>
+            <p>Análisis exhaustivo de datos enlazados generados</p>
+        </header>
+
+        <div class="validation-container">
+            <!-- Acciones -->
+            <div class="validation-section">
+                <h2>Validar Datos RDF</h2>
+                <p class="subtitle">Ejecuta diferentes tipos de validación sobre tus datos</p>
+                
+                <div class="validation-actions">
+                    <button class="btn btn-primary" onclick="validateCurrentRDF()">
+                        🔍 Validación Completa
+                    </button>
+                    <button class="btn btn-secondary" onclick="quickValidate()">
+                        ⚡ Validación Rápida
+                    </button>
+                    <button class="btn btn-secondary" onclick="checkCompleteness()">
+                        📊 Verificar Completitud
+                    </button>
+                </div>
+                
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>
+                        <input type="checkbox" id="includeSchemaValidation" checked>
+                        Incluir validación contra esquema de base de datos
+                    </label>
+                </div>
+            </div>
+
+            <!-- Estado vacío inicial -->
+            <div id="emptyState" class="empty-state">
+                <div class="empty-state-icon">🎯</div>
+                <h2>No hay validación aún</h2>
+                <p>Primero genera datos RDF (Direct Mapping o R2RML) y luego valídalos aquí</p>
+            </div>
+
+            <!-- Puntuación de calidad -->
+            <div id="scoreDisplay" class="score-display" style="display: none;">
+                <div class="score-label">Puntuación de Calidad</div>
+                <div class="score-number" id="scoreNumber">-</div>
+                <div class="score-label" id="scoreStatus">-</div>
+            </div>
+
+            <!-- Métricas -->
+            <div id="metricsSection" class="validation-section" style="display: none;">
+                <h2>📊 Métricas de Calidad</h2>
+                <div class="metrics-grid" id="metricsGrid">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Resultados detallados -->
+            <div id="resultsSection" class="results-section" style="display: none;">
+                <!-- Validaciones pasadas -->
+                <div class="result-category" id="passedResults" style="display: none;">
+                    <h3>✅ Validaciones Pasadas (<span id="passedCount">0</span>)</h3>
+                    <div id="passedList"></div>
+                </div>
+
+                <!-- Advertencias -->
+                <div class="result-category" id="warningResults" style="display: none;">
+                    <h3>⚠️ Advertencias (<span id="warningCount">0</span>)</h3>
+                    <div id="warningList"></div>
+                </div>
+
+                <!-- Errores -->
+                <div class="result-category" id="errorResults" style="display: none;">
+                    <h3>❌ Errores (<span id="errorCount">0</span>)</h3>
+                    <div id="errorList"></div>
+                </div>
+            </div>
+
+            <!-- Indicador de carga -->
+            <div id="loadingIndicator" class="progress-box" style="display: none;">
+                <div class="spinner"></div>
+                <p>Validando datos RDF...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        let currentRDF = null;
+
+        // Cargar RDF desde localStorage si existe
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedRDF = localStorage.getItem('currentRDF');
+            if (savedRDF) {
+                currentRDF = savedRDF;
+                console.log('✅ RDF cargado desde localStorage');
+            } else {
+                console.log('⚠️ No hay RDF almacenado');
+            }
+        });
+
+        async function validateCurrentRDF() {
+            if (!currentRDF) {
+                alert('⚠️ No hay datos RDF para validar.\n\nPrimero genera RDF usando Direct Mapping o R2RML.');
+                return;
+            }
+
+            const includeSchema = document.getElementById('includeSchemaValidation').checked;
+            
+            showLoading(true);
+            hideEmptyState();
+
+            try {
+                const response = await fetch(`${API_BASE}/validation/rdf`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        rdf: currentRDF,
+                        includeSchemaValidation: includeSchema
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Error en validación');
+                }
+
+                displayValidationResults(result.validation);
+                showNotification('✅ Validación completada', 'success');
+
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+                showEmptyState();
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function quickValidate() {
+            if (!currentRDF) {
+                alert('⚠️ No hay datos RDF para validar.');
+                return;
+            }
+
+            showLoading(true);
+            hideEmptyState();
+
+            try {
+                const response = await fetch(`${API_BASE}/validation/quick`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rdf: currentRDF })
+                });
+
+                const result = await response.json();
+                displayValidationResults(result.validation);
+                showNotification('⚡ Validación rápida completada', 'success');
+
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function checkCompleteness() {
+            if (!currentRDF) {
+                alert('⚠️ No hay datos RDF para validar.');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                const response = await fetch(`${API_BASE}/validation/completeness`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rdf: currentRDF })
+                });
+
+                const result = await response.json();
+                alert(`📊 Completitud: ${result.completeness}\n\nRecursos esperados: ${result.metrics.expectedResources}\nRecursos encontrados: ${result.metrics.definedResources}`);
+
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayValidationResults(validation) {
+            const { valid, results, score } = validation;
+
+            // Mostrar puntuación
+            document.getElementById('scoreDisplay').style.display = 'block';
+            document.getElementById('scoreNumber').textContent = score;
+            
+            let status = '';
+            let statusColor = '';
+            if (score >= 90) {
+                status = 'Excelente';
+                statusColor = '#27ae60';
+            } else if (score >= 70) {
+                status = 'Bueno';
+                statusColor = '#f39c12';
+            } else if (score >= 50) {
+                status = 'Aceptable';
+                statusColor = '#e67e22';
+            } else {
+                status = 'Necesita mejoras';
+                statusColor = '#e74c3c';
+            }
+            
+            document.getElementById('scoreStatus').textContent = status;
+            document.getElementById('scoreDisplay').style.background = 
+                `linear-gradient(135deg, ${statusColor} 0%, ${statusColor}dd 100%)`;
+
+            // Mostrar métricas
+            displayMetrics(results.metrics);
+
+            // Mostrar resultados detallados
+            displayResults(results);
+        }
+
+        function displayMetrics(metrics) {
+            const grid = document.getElementById('metricsGrid');
+            grid.innerHTML = '';
+
+            const metricsList = [
+                { label: 'Total Triples', value: metrics.totalTriples, icon: '📦' },
+                { label: 'Recursos Únicos', value: metrics.uniqueSubjects, icon: '🎯' },
+                { label: 'Propiedades', value: metrics.uniquePredicates, icon: '🔗' },
+                { label: 'Densidad Info', value: metrics.informationDensity, icon: '📊' },
+                { label: 'Completitud', value: metrics.completeness || 'N/A', icon: '✓' },
+                { label: 'Tiempo', value: metrics.validationTime, icon: '⏱️' }
+            ];
+
+            metricsList.forEach(metric => {
+                grid.innerHTML += `
+                    <div class="metric-card">
+                        <div style="font-size: 2em; margin-bottom: 10px;">${metric.icon}</div>
+                        <div class="metric-value">${metric.value}</div>
+                        <div class="metric-label">${metric.label}</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('metricsSection').style.display = 'block';
+        }
+
+        function displayResults(results) {
+            // Validaciones pasadas
+            displayResultCategory('passed', results.passed, '✅');
+            
+            // Advertencias
+            displayResultCategory('warning', results.warnings, '⚠️');
+            
+            // Errores
+            displayResultCategory('error', results.errors, '❌');
+
+            document.getElementById('resultsSection').style.display = 'block';
+        }
+
+        function displayResultCategory(type, items, icon) {
+            const section = document.getElementById(`${type}Results`);
+            const count = document.getElementById(`${type}Count`);
+            const list = document.getElementById(`${type}List`);
+
+            if (items.length > 0) {
+                section.style.display = 'block';
+                count.textContent = items.length;
+                list.innerHTML = items.map(item => `
+                    <div class="result-item ${type}">
+                        <div class="result-icon">${icon}</div>
+                        <div class="result-message">
+                            <div>${item.message}</div>
+                            <div class="result-code">[${item.code}]</div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+        }
+
+        function showEmptyState() {
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('scoreDisplay').style.display = 'none';
+            document.getElementById('metricsSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'none';
+        }
+
+        function hideEmptyState() {
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        function showNotification(message, type) {
+            const color = type === 'success' ? '#27ae60' : '#e74c3c';
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${color};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

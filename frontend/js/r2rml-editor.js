@@ -694,6 +694,25 @@ function downloadR2RML() {
     showNotification('✅ Archivo descargado', 'success');
 }
 
+function validateGenerated() {
+    if (!editorState.generatedR2RML) {
+        alert('⚠️ Primero genera el R2RML');
+        return;
+    }
+    
+    localStorage.setItem('currentRDF', editorState.generatedR2RML);
+    window.open('validation.html', '_blank');
+}
+
+function publishFromEditor() {
+    if (!editorState.generatedR2RML) {
+        alert('⚠️ Primero genera el R2RML');
+        return;
+    }
+    
+    localStorage.setItem('currentRDF', editorState.generatedR2RML);
+    window.open('publish.html', '_blank');
+}
 // ===== UTILIDADES =====
 
 function showNotification(message, type) {

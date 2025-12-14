@@ -144,6 +144,7 @@ async function generateDirectMapping() {
         }
         
         currentRDF = result.rdf;
+        localStorage.setItem('currentRDF', currentRDF);
         
         progressBox.style.display = 'none';
         resultBox.style.display = 'block';
@@ -259,6 +260,16 @@ async function downloadRDF() {
     }
 }
 
+// Agregar después de updateExportStats
+function publishToFusekiAdvanced() {
+    if (!currentRDF) {
+        alert('⚠️ Primero debes generar el mapeo RDF');
+        return;
+    }
+    
+    localStorage.setItem('currentRDF', currentRDF);
+    window.location.href = 'publish.html';
+}
 
 function getFileExtension(format) {
     const extensions = {

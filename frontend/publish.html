@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicar en SPARQL - DB2LinkedData</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .publish-container {
+            max-width: 900px;
+            margin: 20px auto;
+        }
+        
+        .health-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .health-indicator.online {
+            background: #d5f4e6;
+            color: #145a32;
+        }
+        
+        .health-indicator.offline {
+            background: #fadbd8;
+            color: #641e16;
+        }
+        
+        .health-indicator .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .health-indicator.online .status-dot {
+            background: #27ae60;
+        }
+        
+        .health-indicator.offline .status-dot {
+            background: #e74c3c;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .dataset-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .dataset-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #ecf0f1;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .dataset-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .dataset-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dataset-item.selected {
+            background: #e8f4f8;
+            border-left: 3px solid #3498db;
+        }
+        
+        .publish-options {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .option-group {
+            margin-bottom: 15px;
+        }
+        
+        .option-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .progress-steps {
+            margin: 20px 0;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #dee2e6;
+        }
+        
+        .step-item.running {
+            border-left-color: #3498db;
+            background: #e8f4f8;
+        }
+        
+        .step-item.completed {
+            border-left-color: #27ae60;
+            background: #d5f4e6;
+        }
+        
+        .step-item.failed {
+            border-left-color: #e74c3c;
+            background: #fadbd8;
+        }
+        
+        .step-icon {
+            font-size: 1.5em;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .step-message {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .result-card h3 {
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .result-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .result-label {
+            opacity: 0.9;
+        }
+        
+        .result-value {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .endpoint-link {
+            color: white;
+            text-decoration: underline;
+            word-break: break-all;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-top: 4px solid #3498db;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📤 Publicar en SPARQL Endpoint</h1>
+            <p>Publica tus datos enlazados en Apache Jena Fuseki</p>
+        </header>
+
+        <div class="publish-container">
+            <!-- Estado de Fuseki -->
+            <div class="card">
+                <h2>Estado del Servidor</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div id="healthStatus">
+                        <span class="health-indicator offline">
+                            <span class="status-dot"></span>
+                            Verificando...
+                        </span>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="checkHealth()">
+                        🔄 Verificar
+                    </button>
+                </div>
+                
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>URL de Fuseki:</label>
+                    <input type="text" id="fusekiUrl" class="form-control" 
+                           value="http://localhost:3030" placeholder="http://localhost:3030">
+                </div>
+            </div>
+
+            <!-- Configuración de publicación -->
+            <div class="card">
+                <h2>Configuración</h2>
+                
+                <div class="form-group">
+                    <label>Dataset:</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="datasetName" class="form-control" 
+                               value="dataset" placeholder="nombre_dataset">
+                        <button class="btn btn-secondary" onclick="loadDatasets()">
+                            📋 Listar
+                        </button>
+                        <button class="btn btn-primary" onclick="createDataset()">
+                            ➕ Crear Nuevo
+                        </button>
+                    </div>
+                    
+                    <div id="datasetList" class="dataset-list" style="display: none;">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                </div>
+
+                <div class="publish-options">
+                    <h3>Opciones de Publicación</h3>
+                    
+                    <div class="option-group">
+                        <label>
+                            <input type="checkbox" id="clearBefore">
+                            Limpiar dataset antes de publicar
+                        </label>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label>
+                            <input type="checkbox" id="createIfNotExists" checked>
+                            Crear dataset si no existe
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Grafo (Graph):</label>
+                        <input type="text" id="graphName" class="form-control" 
+                               value="default" placeholder="default o URI del grafo">
+                    </div>
+                </div>
+
+                <button class="btn btn-success" onclick="publishRDF()" style="width: 100%; padding: 15px; font-size: 1.1em;">
+                    📤 Publicar Datos RDF
+                </button>
+            </div>
+
+            <!-- Progreso de publicación -->
+            <div id="progressSection" class="card" style="display: none;">
+                <h2>Progreso de Publicación</h2>
+                <div id="progressSteps" class="progress-steps">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Resultado de publicación -->
+            <div id="resultSection" style="display: none;">
+                <div class="result-card">
+                    <h3>✅ Publicación Exitosa</h3>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Triples publicados:</span>
+                        <span class="result-value" id="triplesCount">-</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Endpoint SPARQL:</span>
+                        <a href="#" id="sparqlEndpoint" class="endpoint-link" target="_blank">-</a>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Dataset UI:</span>
+                        <a href="#" id="datasetUrl" class="endpoint-link" target="_blank">-</a>
+                    </div>
+                    
+                    <button class="btn btn-secondary" onclick="loadStats()" style="margin-top: 15px; width: 100%;">
+                        📊 Ver Estadísticas del Dataset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div id="statsSection" class="card" style="display: none;">
+                <h2>📊 Estadísticas del Dataset</h2>
+                <div id="statsGrid" class="stats-grid">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        let currentRDF = null;
+        let publishedDataset = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            currentRDF = localStorage.getItem('currentRDF');
+            if (!currentRDF) {
+                alert('⚠️ No hay datos RDF para publicar.\n\nPrimero genera RDF usando Direct Mapping o R2RML.');
+            }
+            checkHealth();
+        });
+
+        async function checkHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/rdf/fuseki/health`);
+                const result = await response.json();
+                
+                const statusEl = document.getElementById('healthStatus');
+                if (result.health.available) {
+                    statusEl.innerHTML = `
+                        <span class="health-indicator online">
+                            <span class="status-dot"></span>
+                            Fuseki disponible
+                        </span>
+                    `;
+                } else {
+                    statusEl.innerHTML = `
+                        <span class="health-indicator offline">
+                            <span class="status-dot"></span>
+                            ${result.health.message}
+                        </span>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('healthStatus').innerHTML = `
+                    <span class="health-indicator offline">
+                        <span class="status-dot"></span>
+                        Error de conexión
+                    </span>
+                `;
+            }
+        }
+
+        async function loadDatasets() {
+            try {
+                const response = await fetch(`${API_BASE}/rdf/fuseki/datasets`);
+                const result = await response.json();
+                
+                const list = document.getElementById('datasetList');
+                
+                if (result.datasets && result.datasets.length > 0) {
+                    list.innerHTML = result.datasets.map(ds => `
+                        <div class="dataset-item" onclick="selectDataset('${ds.name.replace('/', '')}')">
+                            ${ds.name}
+                        </div>
+                    `).join('');
+                    list.style.display = 'block';
+                } else {
+                    list.innerHTML = '<div class="dataset-item">No hay datasets disponibles</div>';
+                    list.style.display = 'block';
+                }
+            } catch (error) {
+                alert(`Error listando datasets: ${error.message}`);
+            }
+        }
+
+        function selectDataset(name) {
+            document.getElementById('datasetName').value = name;
+            document.getElementById('datasetList').style.display = 'none';
+        }
+
+        async function createDataset() {
+            const name = prompt('Nombre del nuevo dataset:');
+            if (!name) return;
+            
+            const type = confirm('¿Crear dataset persistente (TDB2)?\n\nOK = Persistente\nCancelar = En memoria') 
+                ? 'tdb2' : 'mem';
+            
+            try {
+                const response = await fetch(`${API_BASE}/rdf/fuseki/dataset`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, type })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`✅ ${result.message}`);
+                    document.getElementById('datasetName').value = name;
+                } else {
+                    alert(`❌ ${result.error}`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        async function publishRDF() {
+            if (!currentRDF) {
+                alert('⚠️ No hay datos RDF para publicar.');
+                return;
+            }
+            
+            const dataset = document.getElementById('datasetName').value;
+            const graph = document.getElementById('graphName').value;
+            const clearBefore = document.getElementById('clearBefore').checked;
+            const createIfNotExists = document.getElementById('createIfNotExists').checked;
+            
+            if (!dataset) {
+                alert('⚠️ Especifica el nombre del dataset');
+                return;
+            }
+            
+            document.getElementById('progressSection').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('statsSection').style.display = 'none';
+            document.getElementById('progressSteps').innerHTML = '<p>Iniciando publicación...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/rdf/publish`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        rdf: currentRDF,
+                        dataset,
+                        graph,
+                        clearBefore,
+                        createIfNotExists
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayProgress(result.steps);
+                    displayResult(result);
+                    publishedDataset = dataset;
+                    showNotification('✅ Publicación exitosa', 'success');
+                } else {
+                    displayProgress(result.steps);
+                    alert(`❌ Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        function displayProgress(steps) {
+            const stepsHtml = steps.map(step => {
+                const icons = {
+                    health_check: '🏥',
+                    dataset_check: '📋',
+                    clear_dataset: '🧹',
+                    count_triples: '🔢',
+                    upload_data: '📤',
+                    verify_upload: '✅'
+                };
+                
+                const statusEmoji = {
+                    running: '⏳',
+                    completed: '✅',
+                    failed: '❌',
+                    warning: '⚠️'
+                };
+                
+                return `
+                    <div class="step-item ${step.status}">
+                        <div class="step-icon">${icons[step.step] || '📌'}</div>
+                        <div class="step-content">
+                            <div class="step-name">${step.step.replace(/_/g, ' ')}</div>
+                            ${step.message ? `<div class="step-message">${step.message}</div>` : ''}
+                            ${step.error ? `<div class="step-message" style="color: #e74c3c;">${step.error}</div>` : ''}
+                        </div>
+                        <div class="step-icon">${statusEmoji[step.status]}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('progressSteps').innerHTML = stepsHtml;
+        }
+
+        function displayResult(result) {
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('triplesCount').textContent = result.triplesPublished.toLocaleString();
+            
+            const endpointEl = document.getElementById('sparqlEndpoint');
+            endpointEl.textContent = result.sparqlEndpoint;
+            endpointEl.href = result.sparqlEndpoint;
+            
+            const datasetEl = document.getElementById('datasetUrl');
+            datasetEl.textContent = result.datasetUrl;
+            datasetEl.href = result.datasetUrl;
+        }
+
+        async function loadStats() {
+            if (!publishedDataset) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/rdf/fuseki/stats/${publishedDataset}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayStats(result.stats);
+                }
+            } catch (error) {
+                alert(`Error cargando estadísticas: ${error.message}`);
+            }
+        }
+
+        function displayStats(stats) {
+            const grid = document.getElementById('statsGrid');
+            grid.innerHTML = `
+                <div class="stat-box">
+                    <div style="font-size: 2em;">📦</div>
+                    <div class="stat-value">${stats.totalTriples?.toLocaleString() || 0}</div>
+                    <div class="stat-label">Total Triples</div>
+                </div>
+                <div class="stat-box">
+                    <div style="font-size: 2em;">🎯</div>
+                    <div class="stat-value">${stats.totalSubjects?.toLocaleString() || 0}</div>
+                    <div class="stat-label">Recursos</div>
+                </div>
+                <div class="stat-box">
+                    <div style="font-size: 2em;">🔗</div>
+                    <div class="stat-value">${stats.totalPredicates?.toLocaleString() || 0}</div>
+                    <div class="stat-label">Propiedades Únicas</div>
+                </div>
+                <div class="stat-box">
+                    <div style="font-size: 2em;">📊</div>
+                    <div class="stat-value">${stats.classes?.length || 0}</div>
+                    <div class="stat-label">Clases</div>
+                </div>
+            `;
+            
+            document.getElementById('statsSection').style.display = 'block';
+        }
+
+        function showNotification(message, type) {
+            const color = type === 'success' ? '#27ae60' : '#e74c3c';
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${color};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

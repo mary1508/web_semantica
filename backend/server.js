@@ -14,17 +14,20 @@ app.use(express.urlencoded({ extended: true }));
 // Servir archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, '../frontend')));
 
+
 // Importar rutas
 const dbRoutes = require('./routes/dbRoutes');
 const mappingRoutes = require('./routes/mappingRoutes');
 const rdfRoutes = require('./routes/rdfRoutes');
 const r2rmlRoutes = require('./routes/r2rmlRoutes');
+const validationRoutes = require('./routes/validationRoutes');
 
 // Usar rutas
 app.use('/api/db', dbRoutes);
 app.use('/api/mapping', mappingRoutes);
 app.use('/api/rdf', rdfRoutes);
 app.use('/api/r2rml', r2rmlRoutes);
+app.use('/api/validation', validationRoutes);
 
 // Ruta de prueba
 app.get('/api/health', (req, res) => {
